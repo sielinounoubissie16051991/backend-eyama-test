@@ -22,7 +22,7 @@ services:
     networks:
       - heyama-network
     environment:
-      MONGO_URI: mongodb://mongo:27017/heyama
+      MONGODB_URI: mongodb+srv://sielinou:0EsoOmQYoawvs7t9@eyama-cluster.x8rjqtr.mongodb.net/eyama?appName=eyama-cluster
       PORT: 3001
       FRONTEND_URL: ${FRONTEND_URL}
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}

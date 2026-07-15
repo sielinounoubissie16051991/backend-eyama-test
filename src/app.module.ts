@@ -1,4 +1,5 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Module, Type } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -7,10 +8,21 @@ import { ObjectsModule } from './objects/objects.module';
 
 // Liste des modules à importer dans AppModule.
 // CloudinaryModule est chargé en permanence pour gérer les uploads d'images.
-const imports: Array<DynamicModule | typeof CloudinaryModule | typeof ObjectsModule> = [CloudinaryModule];
-
+const imports: Array<Type<any> | DynamicModule | Promise<DynamicModule>> = [
+  ConfigModule.forRoot({
+    isGlobal: true,
+  }),
+  CloudinaryModule,
+];
+/*
+const imports: Array<Type<any> | DynamicModule> = [
+  
+  CloudinaryModule
+];
+*/
 // Si MONGODB_URI est défini, on active la connexion MongoDB.
 // Cela permet l'utilisation de la persistance réelle plutôt que du stockage en mémoire.
+console.log('MONGODB_URI =', process.env.MONGODB_URI);
 if (process.env.MONGODB_URI) {
   imports.unshift(
     MongooseModule.forRootAsync({
