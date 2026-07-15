@@ -1,6 +1,10 @@
+import { config } from 'dotenv';
+config();
+
 import { DynamicModule, Module, Type } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ServerApiVersion } from 'mongodb';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
@@ -28,10 +32,15 @@ if (process.env.MONGODB_URI) {
     MongooseModule.forRootAsync({
       useFactory: () => ({
         uri: process.env.MONGODB_URI,
+        serverApi: {
+          version: ServerApiVersion.v1,
+          strict: true,
+          deprecationErrors: true,
+        },
         connectionFactory: (connection) => {
           // Sur erreur de connexion MongoDB, on affiche un message clair en console.
           connection.on('error', (error: any) => {
-            console.error('ECHEC DE CONNEXION A LA BASE DE DONNEE');
+            console.error('ECHEC DE CONNEXION A LA BASE DE DONNEE', error);
           });
           // Quand la connexion est établie, afficher une confirmation.
           connection.once('open', () => {

@@ -8,11 +8,30 @@ config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const allowedOrigins = [
+      'http://localhost:3000',
+      'https://front-end-eyama-test.vercel.app' //  URL Vercel de production
+    ];
 
+    app.enableCors({
+      origin: (origin, callback) => {
+        // Permettre les requêtes sans origine (comme Postman ou les requêtes serveurs)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Bloqué par la politique CORS d\'Eyama'));
+        }
+      },
+      credentials: true,
+    });
+/*
   app.enableCors({
     origin: process.env.FRONTEND_URL || '*',
     credentials: true,
   });
+  */
 
   app.useGlobalPipes(
     new ValidationPipe({

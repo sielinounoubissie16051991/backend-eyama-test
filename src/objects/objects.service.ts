@@ -19,26 +19,26 @@ export class ObjectsService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    // Seeds: use string `_id` so `findById('seed-1')` works consistently
+    // Seeds: use string `_id` so `findById('107f1f77bcf86cd799439011')` works consistently
     const seedObjects: any[] = [
       {
-        _id: 'seed-1',
-        id: 'seed-1',
+        _id: '107f1f77bcf86cd799439011',
+        id: '107f1f77bcf86cd799439011',
         title: 'Vase en céramique',
         description: 'Un objet de décoration à exposer dans un salon moderne.',
         imageUrl:
           'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=900&q=80',
-        imagePublicId: '',
+        imagePublicId: 'seed-vase-ceramique',
         createdAt: new Date('2026-07-10T09:30:00.000Z'),
       },
       {
-        _id: 'seed-2',
-        id: 'seed-2',
+        _id: '207f1f77bcf86cd799439011',
+        id: '207f1f77bcf86cd799439011',
         title: 'Lampe de bureau',
         description: 'Lampe compacte avec une lumière douce pour les soirées de travail.',
         imageUrl:
           'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=80',
-        imagePublicId: '',
+        imagePublicId: 'seed-lampe-bureau',
         createdAt: new Date('2026-07-12T15:45:00.000Z'),
       },
     ];
