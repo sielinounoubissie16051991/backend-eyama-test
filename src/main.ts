@@ -15,16 +15,22 @@ async function bootstrap() {
 
     app.enableCors({
       origin: (origin, callback) => {
-        // Permettre les requêtes sans origine (comme Postman ou les requêtes serveurs)
+        // 1. Permettre les requêtes sans origine (Postman, mobile, etc.)
         if (!origin) return callback(null, true);
         
-        if (allowedOrigins.includes(origin)) {
+        // 2. Permettre si l'origine est explicitement dans la liste
+        // 3. OU si c'est une URL de prévisualisation générée par Vercel pour votre projet
+        if (
+          allowedOrigins.includes(origin) || 
+          origin.endsWith('.vercel.app') // Autorise tous les sous-domaines Vercel au cas où
+        ) {
           callback(null, true);
         } else {
           callback(new Error('Bloqué par la politique CORS d\'Eyama'));
         }
       },
       credentials: true,
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     });
 /*
   app.enableCors({
