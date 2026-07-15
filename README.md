@@ -1,98 +1,239 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+﻿# Backend Eyama - Manuel d'utilisation
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Ce dépôt contient le backend NestJS de l’application Eyama.
+Il gère :
 
-## Project setup
+- la gestion des objets
+- le stockage d’images sur Cloudinary
+- une persistance optionnelle sur MongoDB
+- une API documentée avec Swagger
 
-```bash
-$ npm install
-```
+## Pré-requis
 
-## Compile and run the project
+- Node.js 18+ ou version compatible
+- npm
+- MongoDB si vous voulez la persistance
+- Cloudinary pour l’upload d’images
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
+## Installation du projet
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
+## Configuration des variables d’environnement
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Créez un fichier `.env` à la racine du projet.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Exemple de contenu :
+
+```env
+PORT=3001
+MONGODB_URI=mongodb://127.0.0.1:27017/eyama
+FRONTEND_URL=http://localhost:3000
+CLOUDINARY_CLOUD_NAME=YOUR_CLOUD_NAME
+CLOUDINARY_API_KEY=YOUR_API_KEY
+CLOUDINARY_API_SECRET=YOUR_API_SECRET
+```
+
+### Explication des variables
+
+- `PORT` : port sur lequel le backend écoute
+- `MONGODB_URI` : URL de connexion MongoDB
+- `FRONTEND_URL` : origine autorisée pour CORS
+- `CLOUDINARY_CLOUD_NAME` : nom de ton compte Cloudinary
+- `CLOUDINARY_API_KEY` : clé API Cloudinary
+- `CLOUDINARY_API_SECRET` : secret API Cloudinary
+
+## Comportement MongoDB
+
+Le backend active MongoDB uniquement si `MONGODB_URI` est défini.
+
+- si `MONGODB_URI` existe : connexion réelle à MongoDB
+- si `MONGODB_URI` est absent : l’application utilise un stockage en mémoire
+
+Cela signifie que tu peux tester l’application sans base, mais les données disparaissent au redémarrage.
+
+## Installation et utilisation de MongoDB sur Windows
+
+### 1) Vérifier si MongoDB est installé
+
+```powershell
+where mongod
+where mongosh
+where mongo
+```
+
+### 2) Installer MongoDB Server
+
+```powershell
+winget install --id MongoDB.Server -e
+```
+
+### 3) Installer MongoDB Shell (mongosh)
+
+```powershell
+winget install --id MongoDB.Shell -e
+```
+
+### 4) Démarrer MongoDB
+
+#### Option A : service Windows
+
+```powershell
+Start-Process powershell -Verb runAs
+net start MongoDB
+```
+
+#### Option B : démarrage manuel
+
+```powershell
+mkdir C:\data\db
+"C:\Program Files\MongoDB\Server\8.3\bin\mongod.exe" --dbpath "C:\data\db"
+```
+
+> Remplace `8.3` par la version installée.
+
+### 5) Se connecter à MongoDB
+
+```powershell
+mongosh "mongodb://127.0.0.1:27017/eyama"
+```
+
+Si `mongosh` n’est pas trouvé, utilise le chemin complet :
+
+```powershell
+& "C:\Program Files\MongoDB\Server\8.3\bin\mongosh.exe" "mongodb://127.0.0.1:27017/eyama"
+```
+
+### 6) Arrêter MongoDB
+
+Si MongoDB tourne comme service :
+
+```powershell
+net stop MongoDB
+```
+
+Si tu l’as démarré manuellement :
+
+- ferme la fenêtre du terminal où `mongod` tourne
+- ou presse `Ctrl+C`
+
+### 7) Vérifier le port MongoDB
+
+```powershell
+Test-NetConnection -ComputerName 127.0.0.1 -Port 27017
+```
+
+## Lancement de l’application
+
+### Mode développement
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Mode production
 
-## Resources
+```bash
+npm run build
+npm run start:prod
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### Vérifier la compilation TypeScript
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+npx tsc --noEmit
+```
 
-## Support
+## Documentation Swagger
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Une fois l’application démarrée, la documentation est disponible ici :
 
-## Stay in touch
+```text
+http://localhost:3001/api
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Endpoints disponibles
 
-## License
+### Objets
+
+- `GET /objects` : récupère tous les objets
+- `POST /objects` : crée un objet avec une image
+- `GET /objects/:id` : récupère un objet par son ID
+- `DELETE /objects/:id` : supprime un objet
+
+### Cloudinary
+
+- `POST /cloudinary/upload` : upload d’une image
+- `DELETE /cloudinary/:publicId` : suppression d’une image Cloudinary
+
+## Exemples d’utilisation
+
+### Créer un objet
+
+```bash
+curl -X POST http://localhost:3001/objects \
+  -F "title=Mon titre" \
+  -F "description=Ma description" \
+  -F "image=@/chemin/vers/image.jpg"
+```
+
+### Lister les objets
+
+```bash
+curl http://localhost:3001/objects
+```
+
+### Récupérer un objet
+
+```bash
+curl http://localhost:3001/objects/<id>
+```
+
+### Supprimer un objet
+
+```bash
+curl -X DELETE http://localhost:3001/objects/<id>
+```
+
+### Uploader une image Cloudinary
+
+```bash
+curl -X POST http://localhost:3001/cloudinary/upload \
+  -F "file=@/chemin/vers/image.jpg"
+```
+
+### Supprimer une image Cloudinary
+
+```bash
+curl -X DELETE http://localhost:3001/cloudinary/<publicId>
+```
+
+## Structure du projet
+
+- `src/main.ts` : bootstrap NestJS et configuration de Swagger
+- `src/app.module.ts` : configuration globale, module Cloudinary, MongoDB
+- `src/objects` : contrôleur, service, DTO, schéma
+- `src/cloudinary` : upload et suppression Cloudinary
+- `src/events` : WebSocket et émission d’événements
+
+## Conseils de configuration
+
+- Ne pas committer les secrets Cloudinary ou les identifiants MongoDB
+- Assurer que `MONGODB_URI` est défini en production
+- Utiliser Swagger pour tester les routes
+- S’assurer que le port `3001` est libre avant de lancer l’app
+
+## Débogage rapide
+
+- `npm run start:dev`
+- `npx tsc --noEmit`
+- `curl http://localhost:3001/api`
+- `curl http://localhost:3001/objects`
+
+## Licence
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
