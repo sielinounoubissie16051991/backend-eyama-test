@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ObjectResponseDto {
+  @ApiProperty({ example: 'seed-1', description: 'Identifiant optionnel de l’objet', required: false })
+  id?: string;
+
   @ApiProperty({ example: '64a9c0e75d1f3d0023b0f8d1', description: 'Identifiant MongoDB de l’objet' })
   _id!: string;
 

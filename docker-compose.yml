@@ -1,0 +1,37 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: heyama-mongo
+    restart: unless-stopped
+    # Pas de port public: seule l'API (meme reseau Docker) doit pouvoir joindre Mongo
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - heyama-network
+
+  api:
+    build: .
+    container_name: heyama-api
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    ports:
+      # Bind sur 127.0.0.1 uniquement: seul Nginx sur l'hote proxy vers l'API,
+      # pas d'exposition directe sur internet
+      - "127.0.0.1:3001:3001"
+    networks:
+      - heyama-network
+    environment:
+      MONGO_URI: mongodb://mongo:27017/heyama
+      PORT: 3001
+      FRONTEND_URL: ${FRONTEND_URL}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+
+volumes:
+  mongo_data:
+
+networks:
+  heyama-network:
+    driver: bridge

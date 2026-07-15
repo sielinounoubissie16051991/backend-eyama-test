@@ -59,16 +59,33 @@ export class ObjectsController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Récupérer la liste de tous les objets' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des objets récupérée avec succès.',
+    type: ObjectResponseDto,
+    isArray: true,
+  })
   findAll() {
     return this.objectsService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Récupérer les détails d’un objet par son id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Objet trouvé avec succès.',
+    type: ObjectResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'Objet non trouvé.' })
   findOne(@Param('id') id: string) {
     return this.objectsService.findOne(id);
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Supprimer un objet par son id' })
+  @ApiResponse({ status: 200, description: 'Objet supprimé avec succès.' })
+  @ApiResponse({ status: 404, description: 'Objet non trouvé.' })
   remove(@Param('id') id: string) {
     return this.objectsService.remove(id);
   }

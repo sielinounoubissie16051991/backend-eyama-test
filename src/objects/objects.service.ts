@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Optional } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit, Optional } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { ObjectEntity, ObjectDocument } from './schemas/object.schema';
@@ -7,7 +7,7 @@ import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
-export class ObjectsService {
+export class ObjectsService implements OnModuleInit {
   private readonly inMemoryObjects: ObjectEntity[] = [];
 
   constructor(
@@ -17,6 +17,55 @@ export class ObjectsService {
     private readonly cloudinaryService: CloudinaryService,
     private readonly eventsGateway: EventsGateway,
   ) {}
+
+  onModuleInit() {
+    // Seeds: use string `_id` so `findById('seed-1')` works consistently
+    const seedObjects: any[] = [
+      {
+        _id: 'seed-1',
+        id: 'seed-1',
+        title: 'Vase en céramique',
+        description: 'Un objet de décoration à exposer dans un salon moderne.',
+        imageUrl:
+          'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=900&q=80',
+        imagePublicId: '',
+        createdAt: new Date('2026-07-10T09:30:00.000Z'),
+      },
+      {
+        _id: 'seed-2',
+        id: 'seed-2',
+        title: 'Lampe de bureau',
+        description: 'Lampe compacte avec une lumière douce pour les soirées de travail.',
+        imageUrl:
+          'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=900&q=80',
+        imagePublicId: '',
+        createdAt: new Date('2026-07-12T15:45:00.000Z'),
+      },
+    ];
+
+    if (this.objectModel) {
+      const model = this.objectModel;
+
+      // Ensure seeds exist: insert individually if missing (by string _id)
+      (async () => {
+        try {
+          for (const seed of seedObjects) {
+            const found = await model.findById(seed._id).exec();
+            if (!found) {
+              await model.create(seed);
+              console.log(`Seed inséré: ${seed._id}`);
+            }
+          }
+        } catch (error) {
+          console.error('Échec de l’insertion des seeds MongoDB:', error);
+        }
+      })();
+
+      return;
+    }
+
+    this.inMemoryObjects.push(...(seedObjects as ObjectEntity[]));
+  }
 
   private createMemoryObject(dto: CreateObjectDto, uploadResult: any): ObjectEntity {
     const object: ObjectEntity = {
@@ -102,7 +151,9 @@ export class ObjectsService {
     }
 
     const found = this.inMemoryObjects[index];
-    await this.cloudinaryService.deleteImage(found.imagePublicId);
+    if (found.imagePublicId && !found.imagePublicId.startsWith('seed-')) {
+      await this.cloudinaryService.deleteImage(found.imagePublicId);
+    }
     this.inMemoryObjects.splice(index, 1);
     this.eventsGateway.emitObjectDeleted(id);
   }

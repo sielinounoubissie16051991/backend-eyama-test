@@ -6,6 +6,10 @@ export type ObjectDocument = ObjectEntity & Document;
 
 @Schema({ timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class ObjectEntity {
+  @ApiProperty({ example: 'seed-1', description: 'Identifiant optionnel de l’objet' , required: false })
+  @Prop()
+  id?: string;
+
   @ApiProperty({ example: 'Mon titre', description: 'Titre de l’objet' })
   @Prop({ required: true })
   title!: string;
